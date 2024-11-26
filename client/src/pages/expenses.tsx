@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Expense } from "@/lib/types";
 import axios from "axios";
-import exp from "constants";
+// import exp from "constants";
 
 const categories = [
   "All Categories",

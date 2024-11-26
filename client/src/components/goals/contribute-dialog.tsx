@@ -31,7 +31,7 @@ export function ContributeDialog({
     e.preventDefault()
     const contributionAmount = parseFloat(amount)
     if (contributionAmount > 0) {
-      onContribute(goal.id, contributionAmount)
+      onContribute(goal.goalId, contributionAmount)
       onOpenChange(false)
       setAmount("")
     }

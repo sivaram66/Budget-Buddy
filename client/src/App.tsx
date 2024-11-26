@@ -12,7 +12,7 @@ import { ProfilePage } from '@/pages/profile';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import LandingPage from './pages/landingPage';
 import { Toaster } from '@/components/ui/sonner';
-import ProtectedRoute from '@/components/auth/protectedRoute';
+// import ProtectedRoute from '@/components/auth/protectedRoute';
 import axios from 'axios';
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
