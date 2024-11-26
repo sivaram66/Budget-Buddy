@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 // Configure CORS
 const corsOptions = {
-  origin: process.env.MODE === "dev" ? "http://localhost:5173" : "https://v2-budget-buddy.vercel.app",
+  origin: process.env.MODE === "dev" ? "http://localhost:5173" : "https://budgetbuddy.hvsaikrishna.dev",
   credentials: true,
 };
 
