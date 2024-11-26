@@ -42,7 +42,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     };
 
     checkAuthStatus();
-  }, [navigate]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
