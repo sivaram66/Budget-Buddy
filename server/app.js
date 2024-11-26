@@ -12,12 +12,12 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Configure CORS
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: process.env.MODE === "dev" ? "http://localhost:5173" : "https://v2-budget-buddy.vercel.app",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 connectDB();
