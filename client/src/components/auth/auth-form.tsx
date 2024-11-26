@@ -18,13 +18,12 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Add a ref to track whether checkAuth has been performed
-  const authCheckPerformed = useRef(false);
-
   useEffect(() => {
+    let isMounted = true;
+
     const checkAuthStatus = async () => {
-      // Only perform auth check if it hasn't been done before
-      if (authCheckPerformed.current) return;
+      // Avoid multiple concurrent requests
+      if (loading) return;
 
       setLoading(true);
       try {
@@ -37,20 +36,28 @@ export function AuthForm({ mode }: AuthFormProps) {
           withCredentials: true
         });
 
-        if (response.status === 200) {
+        // Only navigate if the component is still mounted
+        if (isMounted && response.status === 200) {
           navigate("/dashboard");
         }
       } catch (error) {
         console.log("User not logged in.");
       } finally {
-        setLoading(false);
-        // Mark that auth check has been performed
-        authCheckPerformed.current = true;
+        // Only set loading to false if the component is still mounted
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
+    // Perform the check only once when the component mounts
     checkAuthStatus();
-  }, [navigate]);
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
