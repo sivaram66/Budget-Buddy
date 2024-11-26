@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,12 +15,18 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [valMsg, setValMsg] = useState("");
-  const [loading, setLoading] = useState(false);  // Changed initial loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Add a ref to track whether checkAuth has been performed
+  const authCheckPerformed = useRef(false);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      setLoading(true);  // Explicitly set loading to true
+      // Only perform auth check if it hasn't been done before
+      if (authCheckPerformed.current) return;
+
+      setLoading(true);
       try {
         const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
         if (!serverUrl) {
@@ -37,12 +43,14 @@ export function AuthForm({ mode }: AuthFormProps) {
       } catch (error) {
         console.log("User not logged in.");
       } finally {
-        setLoading(false);  // Always set loading to false
+        setLoading(false);
+        // Mark that auth check has been performed
+        authCheckPerformed.current = true;
       }
     };
 
     checkAuthStatus();
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +62,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
 
     try {
-      setLoading(true);  // Set loading to true during submission
+      setLoading(true);
       const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
       if (!serverUrl) {
         throw new Error("Server URL is not defined.");
@@ -77,7 +85,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         setValMsg("An unexpected error occurred");
       }
     } finally {
-      setLoading(false);  // Always set loading to false
+      setLoading(false);
     }
   };
 
