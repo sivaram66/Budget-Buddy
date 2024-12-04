@@ -1,26 +1,41 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import cors from "cors"; // Import the cors middleware
-import { connectDB } from "./config/db.js";
+import cors from "cors";
 import dotenv from "dotenv";
+import { connectDB } from "./config/db.js";
+
 dotenv.config();
+
 // Initialize Express app
 const app = express();
+
 // Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// Configure CORS
+// Configure CORS for specific routes
 const corsOptions = {
   origin: process.env.MODE === "dev" ? "http://localhost:5173" : "https://budgetbuddy.hvsaikrishna.dev",
   credentials: true,
 };
 
-app.use(cors(corsOptions));
+// Apply CORS middleware only for routes that need it
+app.use((req, res, next) => {
+  if (req.path !== "/health") {
+    cors(corsOptions)(req, res, next);
+  } else {
+    next();
+  }
+});
 
 // Connect to MongoDB
 connectDB();
+
+// Health check route (no CORS restrictions)
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", uptime: process.uptime() });
+});
 
 // Routes
 import signupRoute from "./routes/signup.js";
@@ -28,18 +43,19 @@ import loginRoute from "./routes/login.js";
 import logoutRoute from "./routes/logout.js";
 import dashboardRoute from "./routes/dashboard.js";
 import expenseRoute from "./routes/expenses.js";
-import goalsRoute from "./routes/goals.js"
-import userRoute from "./routes/user.js"
+import goalsRoute from "./routes/goals.js";
+import userRoute from "./routes/user.js";
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
 app.use("/logout", logoutRoute);
 app.use("/signup", signupRoute);
 app.use("/login", loginRoute);
 app.use("/dashboard", dashboardRoute);
 app.use("/expense", expenseRoute);
-app.use("/goals", goalsRoute)
+app.use("/goals", goalsRoute);
 app.use("/user", userRoute);
 
 // Error handling middleware
