@@ -34,7 +34,7 @@ connectDB();
 
 // Health check route (no CORS restrictions)
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", uptime: process.uptime() });
+  res.status(200).json({ status: "OK" });
 });
 
 // Routes
