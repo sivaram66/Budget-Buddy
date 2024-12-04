@@ -16,6 +16,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [name, setName] = useState("");
   const [valMsg, setValMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     const checkAuthStatus = async () => {
       // Avoid multiple concurrent requests
-      if (loading) return;
+      if (loading || checkedAuth) return;
 
       setLoading(true);
       try {
@@ -46,6 +47,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         // Only set loading to false if the component is still mounted
         if (isMounted) {
           setLoading(false);
+          setCheckedAuth(true);
         }
       }
     };
@@ -57,7 +59,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, [loading, checkedAuth, navigate]); // Add dependencies to avoid infinite loop
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
