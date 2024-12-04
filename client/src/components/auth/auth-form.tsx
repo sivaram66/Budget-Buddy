@@ -24,7 +24,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     const checkAuthStatus = async () => {
       // Avoid multiple concurrent requests
-      if (loading || checkedAuth) return;
+      if (checkedAuth) return;
 
       setLoading(true);
       try {
@@ -59,7 +59,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     return () => {
       isMounted = false;
     };
-  }, [loading, checkedAuth, navigate]); // Add dependencies to avoid infinite loop
+  }, [checkedAuth, navigate]); // Add dependencies to avoid infinite loop
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
