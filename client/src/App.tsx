@@ -43,10 +43,6 @@ function App() {
     checkAuthStatus();
   }, []);
 
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>; // Show loading state until authentication check is complete
-  }
-
   return (
     <ThemeProvider defaultTheme="system" storageKey="budget-buddy-theme">
       <Router>
@@ -57,73 +53,91 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              isAuthenticated ? (
-                <DashboardLayout>
-                  <DashboardPage />
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated === null ? (
+                <div>Loading...</div>
+              ) :
+                isAuthenticated ? (
+                  <DashboardLayout>
+                    <DashboardPage />
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" />
+                )
             }
           />
           <Route
             path="/dashboard/analytics"
             element={
-              isAuthenticated ? (
-                <DashboardLayout>
-                  <AnalyticsPage />
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated === null ? (
+                <div>Loading...</div>
+              ) :
+                isAuthenticated ? (
+                  <DashboardLayout>
+                    <AnalyticsPage />
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" />
+                )
             }
           />
           <Route
             path="/dashboard/expenses"
             element={
-              isAuthenticated ? (
-                <DashboardLayout>
-                  <ExpensesPage />
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated === null ? (
+                <div>Loading...</div>
+              ) :
+                isAuthenticated ? (
+                  <DashboardLayout>
+                    <ExpensesPage />
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" />
+                )
             }
           />
           <Route
             path="/dashboard/goals"
             element={
-              isAuthenticated ? (
-                <DashboardLayout>
-                  <GoalsPage />
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated === null ? (
+                <div>Loading...</div>
+              ) :
+                isAuthenticated ? (
+                  <DashboardLayout>
+                    <GoalsPage />
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" />
+                )
             }
           />
           <Route
             path="/dashboard/settings"
             element={
-              isAuthenticated ? (
-                <DashboardLayout>
-                  <SettingsPage />
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated === null ? (
+                <div>Loading...</div>
+              ) :
+                isAuthenticated ? (
+                  <DashboardLayout>
+                    <SettingsPage />
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" />
+                )
             }
           />
           <Route
             path="/dashboard/profile"
             element={
-              isAuthenticated ? (
-                <DashboardLayout>
-                  <ProfilePage />
-                </DashboardLayout>
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated === null ? (
+                <div>Loading...</div>
+              ) :
+                isAuthenticated ? (
+                  <DashboardLayout>
+                    <ProfilePage />
+                  </DashboardLayout>
+                ) : (
+                  <Navigate to="/login" />
+                )
             }
           />
         </Routes>
