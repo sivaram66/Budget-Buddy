@@ -23,12 +23,6 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Create an AuthLayout component to provide authentication context
-function AuthLayout() {
-  const setIsAuthenticated = useOutletContext<React.Dispatch<React.SetStateAction<boolean | null>>>();
-  return <Outlet context={setIsAuthenticated} />;
-}
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
