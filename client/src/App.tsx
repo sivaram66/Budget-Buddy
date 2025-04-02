@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { LoginPage } from '@/pages/login';
 import { SignupPage } from '@/pages/signup';
@@ -12,7 +12,6 @@ import { ProfilePage } from '@/pages/profile';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import LandingPage from './pages/landingPage';
 import { Toaster } from '@/components/ui/sonner';
-// import ProtectedRoute from '@/components/auth/protectedRoute';
 import axios from 'axios';
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -22,6 +21,12 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 ml-16 lg:ml-64 overflow-y-auto">{children}</main>
     </div>
   );
+}
+
+// Create an AuthLayout component to provide authentication context
+function AuthLayout() {
+  const setIsAuthenticated = useOutletContext<React.Dispatch<React.SetStateAction<boolean | null>>>();
+  return <Outlet context={setIsAuthenticated} />;
 }
 
 function App() {
@@ -48,8 +53,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route element={<Outlet context={setIsAuthenticated} />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+          </Route>
           <Route
             path="/dashboard"
             element={

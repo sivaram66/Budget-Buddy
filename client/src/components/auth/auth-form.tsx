@@ -8,9 +8,10 @@ import axios from "axios";
 
 interface AuthFormProps {
   mode: 'login' | 'signup';
+  setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -39,6 +40,9 @@ export function AuthForm({ mode }: AuthFormProps) {
 
         // Only navigate if the component is still mounted
         if (isMounted && response.status === 200) {
+          if (setIsAuthenticated) {
+            setIsAuthenticated(true);
+          }
           navigate("/dashboard");
         }
       } catch (error) {
@@ -59,7 +63,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     return () => {
       isMounted = false;
     };
-  }, [checkedAuth, navigate]); // Add dependencies to avoid infinite loop
+  }, [checkedAuth, navigate, setIsAuthenticated]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +86,11 @@ export function AuthForm({ mode }: AuthFormProps) {
         : await axios.post(`${serverUrl}signup`, { name, email, password }, { withCredentials: true });
 
       if (response.status === 200) {
-        navigate("/dashboard");
+        // Update the authentication state in the parent component
+        if (setIsAuthenticated) {
+          setIsAuthenticated(true);
+        }
+        navigate("/dashboard", { replace: true });
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
