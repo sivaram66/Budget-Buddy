@@ -3,15 +3,22 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
 export const createExpense2 = async (req, res, next) => {
 
+    const prompt = `
+    You are an expense categorization tool. Assign the provided expense to one category from this required list:
+    Food & Dining
+    Transportation
+    Shopping
+    Entertainment
+    Bills & Utilities
+    Other
+    Rule 1: Choose the most fitting category.
+    Rule 2: If an expense could fit in "Food & Dining", "Transportation", "Shopping", "Entertainment", or "Bills & Utilities", you must choose one of those.
+    Rule 3: Only assign to "Other" as a last resort when no other category is suitable.`;
+
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API);
     const expenseStatement = req.body.expense.statement;
     const schema = {
-        description: `Expense Categoriation, Use these as the main Categories:   "Food & Dining",
-  "Transportation",
-  "Shopping",
-  "Entertainment",
-  "Bills & Utilities",
-  "Other", Any subcategories must be fit into the main categories or put it in other.`,
+        description: `Expense Categorization`,
         type: SchemaType.OBJECT,
         properties: {
             amount: {

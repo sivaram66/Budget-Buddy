@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 interface AuthFormProps {
-  mode: 'login' | 'signup';
+  mode: "login" | "signup";
   setIsAuthenticated?: React.Dispatch<React.SetStateAction<boolean | null>>;
 }
 
@@ -30,12 +37,13 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
       setLoading(true);
       try {
         const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+        // console.log(serverUrl);
         if (!serverUrl) {
           throw new Error("Server URL is not defined.");
         }
 
         const response = await axios.get(`${serverUrl}login/checkAuth`, {
-          withCredentials: true
+          withCredentials: true,
         });
 
         // Only navigate if the component is still mounted
@@ -46,7 +54,7 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
           navigate("/dashboard");
         }
       } catch (error) {
-        console.log("User not logged in.");
+        console.log("User not logged in.", error);
       } finally {
         // Only set loading to false if the component is still mounted
         if (isMounted) {
@@ -69,7 +77,7 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
     e.preventDefault();
     setValMsg("");
 
-    if (!email || !password || (mode === 'signup' && !name)) {
+    if (!email || !password || (mode === "signup" && !name)) {
       setValMsg("Please fill in all required fields.");
       return;
     }
@@ -81,10 +89,34 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
         throw new Error("Server URL is not defined.");
       }
 
-      const response = mode === "login"
-        ? await axios.post(`${serverUrl}login`, { email, password }, { withCredentials: true })
-        : await axios.post(`${serverUrl}signup`, { name, email, password }, { withCredentials: true });
+      const response =
+        mode === "login"
+          ? await axios.post(
+              `${serverUrl}login`,
+              { email, password },
+              { withCredentials: true }
+            )
+          : await axios.post(
+              `${serverUrl}signup`,
+              { name, email, password },
+              { withCredentials: true }
+            );
 
+      if (response.status === 201 && mode === "signup") {
+        console.log("Signup Successful");
+        const loginResponse = await axios.post(
+          `${serverUrl}login`,
+          { email, password },
+          { withCredentials: true }
+        );
+        if (loginResponse.status === 200) {
+          console.log("Login after signup success");
+          if (setIsAuthenticated) {
+            setIsAuthenticated(true);
+          }
+          navigate("/dashboard", { replace: true });
+        }
+      }
       if (response.status === 200) {
         // Update the authentication state in the parent component
         if (setIsAuthenticated) {
@@ -93,8 +125,10 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
         navigate("/dashboard", { replace: true });
       }
     } catch (error: unknown) {
+      console.log(error);
       if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message ||
+        const errorMsg =
+          error.response?.data?.message ||
           error.message ||
           "An unexpected error occurred";
         setValMsg(errorMsg);
@@ -113,15 +147,17 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>{mode === 'login' ? 'Login' : 'Create Account'}</CardTitle>
+        <CardTitle>{mode === "login" ? "Login" : "Create Account"}</CardTitle>
         <CardDescription>
-          {mode === 'login' ? 'Enter your credentials to access your account' : 'Create a new account to get started'}
+          {mode === "login"
+            ? "Enter your credentials to access your account"
+            : "Create a new account to get started"}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent>
           <div className="grid w-full items-center gap-4">
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Name</Label>
                 <Input
@@ -160,21 +196,19 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
         </CardContent>
         <CardFooter className="flex flex-col gap-2">
           {valMsg && <p className="text-red-700">{valMsg}</p>}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? 'Processing...' : (mode === 'login' ? 'Login' : 'Sign Up')}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Processing..." : mode === "login" ? "Login" : "Sign Up"}
           </Button>
           <Button
             type="button"
             variant="ghost"
             className="w-full"
-            onClick={() => navigate(mode === 'login' ? '/signup' : '/login')}
+            onClick={() => navigate(mode === "login" ? "/signup" : "/login")}
             disabled={loading}
           >
-            {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Login'}
+            {mode === "login"
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Login"}
           </Button>
         </CardFooter>
       </form>
