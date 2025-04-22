@@ -1,11 +1,16 @@
 pipeline {
-  agent any
-  stages {
-    stage('Checkout') {
-      steps {
-        git(branch: 'main', url: 'https://github.com/your-username/your-repo.git')
-      }
+    agent any
+
+    environment {
+        DOCKERHUB_USER = 'hvsaikrishna'
     }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/hvsk004/v2_BudgetBuddy.git'
+            }
+        }
 
     stage('Generate Image Tag') {
       steps {
