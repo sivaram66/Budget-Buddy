@@ -42,5 +42,18 @@ pipeline {
         }
       }
     }
-  }
+    stage('Deploy') {
+      steps {
+          sh 'docker-compose down'
+          sh 'docker-compose pull'
+          sh 'docker-compose up -d'
+        }
+      }
+    }
+
+    post {
+      failure {
+        echo 'Build failed!'
+      }
+    }
 }
