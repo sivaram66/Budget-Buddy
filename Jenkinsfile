@@ -20,11 +20,11 @@ pipeline {
       steps {
         script {
           // Build frontend Docker image with git commit hash as tag
-          sh "docker build -t hvsaikrishna/budgetbuddy-frontend:${env.GIT_COMMIT} ./client"
+          sh "docker build --no-cache -t hvsaikrishna/budgetbuddy-frontend:${env.GIT_COMMIT} ./client"
           sh "docker tag hvsaikrishna/budgetbuddy-frontend:${env.GIT_COMMIT} hvsaikrishna/budgetbuddy-frontend:latest"
 
           // Build backend Docker image with git commit hash as tag
-          sh "docker build -t hvsaikrishna/budgetbuddy-backend:${env.GIT_COMMIT} ./"
+          sh "docker build --no-cache -t hvsaikrishna/budgetbuddy-backend:${env.GIT_COMMIT} ./"
           sh "docker tag hvsaikrishna/budgetbuddy-backend:${env.GIT_COMMIT} hvsaikrishna/budgetbuddy-backend:latest"
         }
       }
