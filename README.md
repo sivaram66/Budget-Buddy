@@ -17,4 +17,3 @@ Budget Buddy is your personal finance companion, integrated with an open-source 
 - **React.js**: Frontend library for building user interfaces.
 - **Node.js**: JavaScript runtime for building server-side applications.
 - **Socket.IO**: Real-time communication library for chat functionality.
-- **Bootstrap**: Frontend framework for responsive design.
