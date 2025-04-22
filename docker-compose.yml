@@ -6,8 +6,7 @@ services:
     restart: unless-stopped
     depends_on:
       - server
-    environment:
-      - VITE_APP_SERVER_URL=http://localhost:5500
+    pull_policy: always
 
   server:
     image: hvsaikrishna/budgetbuddy-backend:latest
@@ -16,3 +15,4 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    pull_policy: always
