@@ -8,7 +8,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/hvsk004/v2_BudgetBuddy.git'
+                git branch: 'main', 
+                    credentialsId: '0ad543a7-8c82-4c61-98d8-ff74d910a2fc', 
+                    url: 'https://github.com/hvsk004/v2_BudgetBuddy.git'
             }
         }
 
