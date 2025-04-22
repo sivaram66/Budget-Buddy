@@ -34,12 +34,13 @@ export const setJWTCookie = (req, res, next) => {
   const jwtPayload = { userId, name, email };
   const token = signToken(jwtPayload);
 
+  const isDev = process.env.MODE === "dev";
   res.clearCookie("jwt");
   res.cookie("jwt", token, {
-    httpOnly: true, // Recommended for security
-    secure: true, // Recommended for HTTPS connections
+    httpOnly: true,
+    secure: !isDev,
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    sameSite: "none", // Use "strict" with caution
+    sameSite: isDev ? "lax" : "none",
   });
 
   res.status(200).json({ message: "Login Successful" });

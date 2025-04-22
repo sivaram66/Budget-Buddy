@@ -1,0 +1,16 @@
+services:
+  client:
+    image: fe-local
+    ports:
+      - "3200:80"
+    restart: unless-stopped
+    depends_on:
+      - server
+
+  server:
+    image: be-local
+    ports:
+      - "5500:5500"
+    restart: unless-stopped
+    env_file:
+      - .env
