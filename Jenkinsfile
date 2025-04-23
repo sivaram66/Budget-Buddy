@@ -4,12 +4,12 @@ pipeline {
   parameters {
     booleanParam(
       name: 'BUILD_IMAGES',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Build Docker images?'
     )
     booleanParam(
       name: 'PUSH_IMAGES',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Push Docker images to Docker Hub?'
     )
   }
