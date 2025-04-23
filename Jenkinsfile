@@ -77,11 +77,12 @@ pipeline {
           withCredentials([file(credentialsId: 'budgetbuddy-backend-env', variable: 'SECRET_ENV')]) {
             sh '''
               cp "$SECRET_ENV" .env
-              '''
+                '''
           }
         }
-        sh "docker compose down"
-        sh "docker compose up -d"
+        sh "cat .env"
+        sh "docker ps"
+        sh "ls"
       }
     }
   }
