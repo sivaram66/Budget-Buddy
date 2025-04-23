@@ -79,6 +79,8 @@ function LandingPage() {
         <section className="container mx-auto px-4 py-24 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Budget Buddy
+              <br />
               Smart Expense Tracking with AI
               <br />
               Powered by Docker & Jenkins
