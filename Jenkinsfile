@@ -87,9 +87,9 @@ pipeline {
               '''
           }
         }
-        sh "cat .env"
-        sh "docker ps"
         sh "ls"
+        sh "docker compose down"
+        sh "docker compose up -d"
       }
     }
   }
