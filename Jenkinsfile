@@ -88,7 +88,7 @@ pipeline {
           }
         }
         sh "ls"
-        sh "docker compose down"
+        sh "docker compose down --rmi all --volumes"
         sh "docker compose up -d"
       }
     }
