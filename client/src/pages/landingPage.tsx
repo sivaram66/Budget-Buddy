@@ -6,56 +6,56 @@ import {
   PiggyBank,
   Sparkles,
   TrendingUp,
-} from 'lucide-react';
-import { Link } from "react-router-dom"
-import { Button } from '@/components/ui/button';
-import { FeatureCard } from '@/components/feature-card';
-import { ModeToggle } from '@/components/mode-toggle';
-import { ThemeProvider } from '@/components/ui/theme-provider';
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { FeatureCard } from "@/components/feature-card";
+import { ModeToggle } from "@/components/mode-toggle";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 
 const pricingPlans = [
   {
-    name: 'Free',
-    price: '$0',
-    description: 'Perfect for getting started',
+    name: "Free",
+    price: "$0",
+    description: "Perfect for getting started",
     features: [
-      'Basic expense tracking',
-      'Monthly reports',
-      'Up to 100 transactions',
-      'Email support',
+      "Basic expense tracking",
+      "Monthly reports",
+      "Up to 100 transactions",
+      "Email support",
     ],
   },
   {
-    name: 'Pro',
-    price: '$9.99',
-    period: '/month',
-    description: 'Best for personal finance',
+    name: "Pro",
+    price: "$9.99",
+    period: "/month",
+    description: "Best for personal finance",
     features: [
-      'Everything in Free',
-      'Unlimited transactions',
-      'AI-powered insights',
-      'Custom categories',
-      'Priority support',
+      "Everything in Free",
+      "Unlimited transactions",
+      "AI-powered insights",
+      "Custom categories",
+      "Priority support",
     ],
     popular: true,
   },
   {
-    name: 'Enterprise',
-    price: 'Custom',
-    description: 'For large organizations',
+    name: "Enterprise",
+    price: "Custom",
+    description: "For large organizations",
     features: [
-      'Everything in Pro',
-      'Custom integration',
-      'Dedicated account manager',
-      'SLA support',
-      'Team collaboration',
+      "Everything in Pro",
+      "Custom integration",
+      "Dedicated account manager",
+      "SLA support",
+      "Team collaboration",
     ],
   },
 ];
@@ -80,6 +80,8 @@ function LandingPage() {
           <div className="max-w-3xl mx-auto">
             <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Smart Expense Tracking with AI
+              <br />
+              Powered by Docker & Jenkins
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Let artificial intelligence categorize your expenses automatically
@@ -124,16 +126,21 @@ function LandingPage() {
 
         {/* Pricing Section */}
         <section className="container mx-auto px-4 py-24 bg-muted/50">
-          <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">
+            Simple Pricing
+          </h2>
           <p className="text-center text-muted-foreground mb-12">
             Choose the plan that best fits your needs
           </p>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {pricingPlans.map((plan) => (
-              <Card key={plan.name} className={cn(
-                "relative",
-                plan.popular ? "border-primary shadow-lg" : ""
-              )}>
+              <Card
+                key={plan.name}
+                className={cn(
+                  "relative",
+                  plan.popular ? "border-primary shadow-lg" : ""
+                )}
+              >
                 {plan.popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-primary-foreground text-sm rounded-full">
                     Most Popular
@@ -145,7 +152,9 @@ function LandingPage() {
                   <div className="mt-4">
                     <span className="text-4xl font-bold">{plan.price}</span>
                     {plan.period && (
-                      <span className="text-muted-foreground">{plan.period}</span>
+                      <span className="text-muted-foreground">
+                        {plan.period}
+                      </span>
                     )}
                   </div>
                 </CardHeader>
@@ -160,7 +169,9 @@ function LandingPage() {
                   </ul>
                   <Link to="/login">
                     <Button className="w-full mt-6">
-                      {plan.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
+                      {plan.name === "Enterprise"
+                        ? "Contact Sales"
+                        : "Get Started"}
                     </Button>
                   </Link>
                 </CardContent>
@@ -239,5 +250,5 @@ function LandingPage() {
 export default LandingPage;
 
 function cn(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
