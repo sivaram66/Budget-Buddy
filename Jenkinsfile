@@ -1,6 +1,19 @@
 pipeline {
   agent any
 
+  parameters {
+    booleanParam(
+      name: 'BUILD_IMAGES',
+      defaultValue: false,
+      description: 'Build Docker images?'
+    )
+    booleanParam(
+      name: 'PUSH_IMAGES',
+      defaultValue: false,
+      description: 'Push Docker images to Docker Hub?'
+    )
+  }
+
   stages {
     stage('Checkout') {
       steps {
@@ -17,6 +30,9 @@ pipeline {
     }
 
     stage('Build Docker Images') {
+      when {
+        expression { params.BUILD_IMAGES }
+      }
       steps {
         script {
           // Build frontend Docker image with git commit hash as tag
@@ -31,6 +47,9 @@ pipeline {
     }
 
     stage('Push to Docker Hub') {
+      when {
+        expression { params.PUSH_IMAGES }
+      }
       steps {
         script {
           // Log in to Docker Hub
@@ -52,10 +71,13 @@ pipeline {
         }
       }
     }
+
     stage('Docker Deploy') {
       steps {
-        sh "docker compose down"
-        sh "docker compose up -d"
+        // sh "docker compose down"
+        // sh "docker compose up -d"
+           sh "docker ps"
+           sh "ls"
       }
     }
   }
