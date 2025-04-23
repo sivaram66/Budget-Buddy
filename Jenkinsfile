@@ -15,6 +15,13 @@ pipeline {
   }
 
   stages {
+    stage('Clean Workspace') {
+      steps {
+        script {
+          deleteDir()
+        }
+      }
+    }
     stage('Checkout') {
       steps {
         git(
@@ -76,7 +83,7 @@ pipeline {
         script {
           withCredentials([file(credentialsId: 'budgetbuddy-backend-env', variable: 'SECRET_ENV')]) {
             sh '''
-              sudo cp "$SECRET_ENV" .env
+                cp "$SECRET_ENV" .env
               '''
           }
         }
