@@ -7,7 +7,6 @@ Budget Buddy is your personal finance companion, integrated with an open-source 
 - **User Authentication**: Secure authentication system for user registration and login.
 - **Expense Tracking**: Effortlessly add, categorize, and track expenses using the integrated LLM.
 - **Budget Planning**: Set financial goals and budgets for different expense categories.
-- **Chat Interface**: Interactive chatbot interface powered by the LLM for managing expenses and providing financial insights.
 - **Data Visualization**: Visualize spending habits and financial trends using charts and graphs.
 
 ## Technologies Used
