@@ -55,6 +55,7 @@ pipeline {
     stage('Check Docker') {
       steps {
         sh "docker ps -a"
+        sh "docker images"
       }
     }
   }
