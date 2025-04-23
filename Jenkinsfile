@@ -78,6 +78,7 @@ pipeline {
         // sh "docker compose up -d"
            sh "docker ps"
            sh "ls"
+           sh "docker compose -f docker-compose.yml up -d"
       }
     }
   }
