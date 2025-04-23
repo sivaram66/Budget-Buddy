@@ -75,7 +75,9 @@ pipeline {
       steps {
         script {
           withCredentials([file(credentialsId: 'budgetbuddy-backend-env', variable: 'SECRET_ENV')]) {
-            sh " cp ${SECRET_ENV} .env"
+            sh '''
+              cp "$SECRET_ENV" .env
+              '''
           }
         }
         sh "cat .env"
