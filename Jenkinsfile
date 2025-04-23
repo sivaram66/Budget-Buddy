@@ -52,10 +52,10 @@ pipeline {
         }
       }
     }
-    stage('Check Docker') {
+    stage('Docker Deploy') {
       steps {
-        sh "docker ps -a"
-        sh "docker images"
+        sh "docker-compose down"
+        sh "docker-compose up -d"
       }
     }
   }
