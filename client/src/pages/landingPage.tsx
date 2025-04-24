@@ -86,6 +86,8 @@ function LandingPage() {
             <p className="text-xl text-muted-foreground mb-8">
               Let artificial intelligence categorize your expenses automatically
               while you focus on what matters most - your financial goals.
+              <br />
+              Powered by Docker and Jenkins CI/CD
             </p>
             <div className="flex gap-4 justify-center">
               <Link to="/login">
