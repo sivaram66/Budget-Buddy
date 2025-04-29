@@ -82,6 +82,8 @@ function LandingPage() {
               Budget Buddy
               <br />
               Smart Expense Tracking with AI
+              <br />
+              Powered By Docker & Jenkins CI/CD
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Let artificial intelligence categorize your expenses automatically
