@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -6,45 +7,37 @@ import { connectDB } from "./config/db.js";
 
 dotenv.config();
 
+// Initialize Express app
 const app = express();
 
-// trust proxy so secure cookies work behind Render's proxy
-app.set("trust proxy", 1);
-
-app.use(express.json());
+// Middleware
+app.use(bodyParser.json());
 app.use(cookieParser());
 
-
-const FRONTENDS = [
-  "http://localhost:5173",
-  "https://budget-buddyy-v90d.onrender.com", 
-];
-
-// allow list function so you can add/remove origins easily
+// Configure CORS for specific routes
 const corsOptions = {
-  origin(origin, cb) {
-    // allow non-browser tools (curl/postman) & health
-    if (!origin) return cb(null, true);
-    if (FRONTENDS.includes(origin)) return cb(null, true);
-    return cb(new Error(`CORS: Origin not allowed: ${origin}`), false);
-  },
+  origin: process.env.MODE === "dev"
+    ? ["http://localhost:5173", "https://budget-buddyy-v90d.onrender.com", "http://client:80", "http://client:3200", "http://localhost:3200"]
+    : "https://budget-buddyy-v90d.onrender.com",
   credentials: true,
 };
 
-// apply CORS to everything except /health
+// Apply CORS middleware only for routes that need it
 app.use((req, res, next) => {
-  if (req.path === "/health") return next();
-  return cors(corsOptions)(req, res, next);
+  if (req.path !== "/health") {
+    cors(corsOptions)(req, res, next);
+  } else {
+    next();
+  }
 });
 
-// handle preflight for all routes
-app.options("*", cors(corsOptions));
-
-// DB
+// Connect to MongoDB
 connectDB();
 
-// health route (no CORS)
-app.get("/health", (req, res) => res.status(200).json({ ok: true }));
+// Health check route (no CORS restrictions)
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
 
 // Routes
 import signupRoute from "./routes/signup.js";
