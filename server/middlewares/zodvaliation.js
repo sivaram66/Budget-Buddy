@@ -1,10 +1,23 @@
 import zod from "zod";
 
 const signupSchema = zod.object({
-  email: zod.string().email({ message: "Invalid email" }),
-  password: zod.string().min(6, { messgae: "Must be at least 6 characters" }),
-  name: zod.string().min(3, { message: "Must be at least 3 characters" }),
-  dateOfBirth: zod.string().datetime().optional(),
+  name: zod.string().trim().min(3, "Name must be at least 3 characters"),
+  email: zod.string().trim().email("Enter a valid email address"),
+  password: zod
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .max(64, "Password cannot exceed 64 characters")
+    .regex(/[A-Z]/, "Password must include at least one uppercase letter")
+    .regex(/[a-z]/, "Password must include at least one lowercase letter")
+    .regex(/[0-9]/, "Password must include at least one number")
+    .regex(
+      /[!@#$%^&*(),.?":{}|<>]/,
+      "Password must include at least one special character"
+    ),
+  dateOfBirth: zod
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Use date format YYYY-MM-DD")
+    .optional(),
 });
 
 const loginSchema = zod.object({
@@ -22,17 +35,21 @@ const goalSchema = zod.object({
 })
 
 const signupValidation = (req, res, next) => {
-  const input = req.body;
-  const result = signupSchema.safeParse(input);
-  if (result.success) {
-    next();
-  } else {
-    res.status(400).json({
-      error: result.error.errors,
-      message: "Validation error: Invalid Inputs",
+  const result = signupSchema.safeParse(req.body);
+  if (!result.success) {
+    const fieldErrors = result.error.flatten().fieldErrors;
+    console.log("Signup validation errors:", fieldErrors);
+
+    return res.status(400).json({
+      ok: false,
+      message: "Validation error",
+      errors: fieldErrors, // send field-wise errors to frontend
     });
   }
-};
+
+  req.body = result.data;
+  next();
+}
 
 const loginValidation = (req, res, next) => {
   const input = req.body;

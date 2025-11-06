@@ -127,13 +127,21 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
     } catch (error: unknown) {
       console.log(error);
       if (axios.isAxiosError(error)) {
-        const errorMsg =
-          error.response?.data?.message ||
-          error.message ||
-          "An unexpected error occurred";
-        setValMsg(errorMsg);
-      } else {
-        setValMsg("An unexpected error occurred");
+        const errors = error.response?.data?.errors; // field-specific errors
+        const message = error.response?.data?.message;
+
+        //  Flatten all validation messages into one readable string
+        if (errors && typeof errors === "object") {
+          const allMessages = Object.values(errors)
+            .flat()
+            .map((msg) => `• ${msg}`)
+            .join("\n");
+          setValMsg(allMessages);
+        } else if (message) {
+          setValMsg(message);
+        } else {
+          setValMsg("An unexpected error occurred");
+        }
       }
     } finally {
       setLoading(false);
@@ -195,7 +203,7 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-2">
-          {valMsg && <p className="text-red-700">{valMsg}</p>}
+          {valMsg && <p className="text-red-700 whitespace-pre-line">{valMsg}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Processing..." : mode === "login" ? "Login" : "Sign Up"}
           </Button>

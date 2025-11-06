@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}login/checkAuth`, {
+                      const response = await axios.get(`${import.meta.env.VITE_APP_SERVER_URL}login/checkAuth`, {
                     withCredentials: true,
                 });
                 if (response.status === 200) {
