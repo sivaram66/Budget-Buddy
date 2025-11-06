@@ -17,8 +17,8 @@ app.use(cookieParser());
 // Configure CORS for specific routes
 const corsOptions = {
   origin: process.env.MODE === "dev"
-    ? ["http://localhost:5173", "https://budgetbuddy.hvsaikrishna.dev", "http://client:80", "http://client:3200", "http://localhost:3200"]
-    : "https://budgetbuddy.hvsaikrishna.dev",
+    ? ["http://localhost:5173", "https://budget-buddyy-v90d.onrender.com", "http://client:80", "http://client:3200", "http://localhost:3200"]
+    : "https://budget-buddyy-v90d.onrender.com",
   credentials: true,
 };
 
