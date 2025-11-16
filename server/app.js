@@ -62,9 +62,9 @@ import expenseRoute from "./routes/expenses.js";
 import goalsRoute from "./routes/goals.js";
 import userRoute from "./routes/user.js";
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello World!");
+// });
 
 app.use("/logout", logoutRoute);
 app.use("/signup", signupRoute);
