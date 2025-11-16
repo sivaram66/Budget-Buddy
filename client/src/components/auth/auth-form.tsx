@@ -36,7 +36,7 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
 
       setLoading(true);
       try {
-        const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+        const serverUrl = import.meta.env.VITE_APP_SERVER_URL || '';
         // console.log(serverUrl);
         if (!serverUrl) {
           throw new Error("Server URL is not defined.");
