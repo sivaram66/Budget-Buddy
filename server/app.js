@@ -49,9 +49,9 @@ app.use((req, res, next) => {
 connectDB();
 
 // Health check route (no CORS restrictions)
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK" });
-});
+// app.get("/health", (req, res) => {
+//   res.status(200).json({ status: "OK" });
+// });
 
 // Routes
 import signupRoute from "./routes/signup.js";
