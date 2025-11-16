@@ -41,40 +41,76 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
   const [resMsg, setresMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
-    const expense = mode === "normal"
-      ? { statement }
-      : { amount: parseFloat(amount), category, description }
+  e.preventDefault();
+  const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
 
-    try {
-      const response = mode === "normal"
-        ? await axios.post(`${serverUrl}expense/createExpense`, { expense }, { withCredentials: true })
-        : await axios.post(`${serverUrl}expense/newExpense`, { amount: expense.amount, category: expense.category, description: expense.description }, { withCredentials: true })
-      if (response.status === 201) {
-        let msg = response.data.message;
-        console.log(msg)
-        setresMsg(msg);
+  try {
+    let response;
+    
+    if (mode === "normal") {
+      // Normal mode = AI-powered natural language (uses statement)
+      if (!statement.trim()) {
+        setresMsg("Please enter an expense statement");
+        return;
       }
-    }
-    catch (error: unknown) {
-      console.error("Error: " + error);
-      if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message ||
-          error.message ||
-          "An unexpected error occurred";
-        setresMsg(errorMsg);
-      } else {
-        setresMsg("An unexpected error occurred");
+      
+      response = await axios.post(
+        `${serverUrl}expense/createExpense`, 
+        { expense: { statement } },  // ✅ Correct format for AI
+        { withCredentials: true }
+      );
+    } else {
+      // Advanced mode = Manual form (uses amount, category, description)
+      if (!amount || parseFloat(amount) <= 0) {
+        setresMsg("Please enter a valid amount");
+        return;
       }
+      if (!category) {
+        setresMsg("Please select a category");
+        return;
+      }
+      if (!description.trim()) {
+        setresMsg("Please add a description");
+        return;
+      }
+      
+      response = await axios.post(
+        `${serverUrl}expense/newExpense`,
+        { 
+          amount: parseFloat(amount), 
+          category, 
+          description 
+        },  // ✅ Correct format for manual entry
+        { withCredentials: true }
+      );
     }
-    onSubmit(expense)
-    // Reset form
-    setStatement("")
-    setAmount("")
-    setCategory("")
-    setDescription("")
+
+    if (response.status === 201) {
+      const msg = response.data.message;
+      console.log(msg);
+      setresMsg(msg);
+      
+      // Reset form after successful submission
+      setStatement("");
+      setAmount("");
+      setCategory("");
+      setDescription("");
+      
+      // Call parent onSubmit if needed
+      onSubmit(response.data.expense);
+    }
+  } catch (error: unknown) {
+    console.error("Error: " + error);
+    if (axios.isAxiosError(error)) {
+      const errorMsg = error.response?.data?.message || 
+        error.message || 
+        "An unexpected error occurred";
+      setresMsg(errorMsg);
+    } else {
+      setresMsg("An unexpected error occurred");
+    }
   }
+};
 
   return (
     <Card>
