@@ -92,7 +92,7 @@ export const createExpense3 = async (req, res, next) => {
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API);
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash", // Use the specific model - check documentation for latest recommended models
+            model: "gemini-1.5-flash-latest", // Use the specific model - check documentation for latest recommended models
             generationConfig: {
                 responseMimeType: "application/json",
                 responseSchema: expenseSchema, // Pass the schema object here
