@@ -202,7 +202,7 @@ export function ProfilePage() {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {profile.plan === "pro"
-                    ? "$9.99/month"
+                    ? "₹999/month"
                     : "Basic features"}
                 </p>
               </div>

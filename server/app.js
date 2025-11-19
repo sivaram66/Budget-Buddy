@@ -15,19 +15,24 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Configure CORS for specific routes
+// const corsOptions = {
+//   origin: process.env.MODE === "dev"
+//     ? ["http://localhost:5173",
+//        "https://budget-buddyy-v90d.onrender.com", 
+//        "http://client:80", 
+//        "http://client:3200", 
+//        "http://localhost:3200",
+//       "http://localhost",           
+//       "http://127.0.0.1:80",   
+//       "http://127.0.0.1:3200",     
+//       "http://localhost:80",  
+//       "http://127.0.0.1",]
+//     : "https://budget-buddyy-v90d.onrender.com",
+//   credentials: true,
+// };
+
 const corsOptions = {
-  origin: process.env.MODE === "dev"
-    ? ["http://localhost:5173",
-       "https://budget-buddyy-v90d.onrender.com", 
-       "http://client:80", 
-       "http://client:3200", 
-       "http://localhost:3200",
-      "http://localhost",           
-      "http://127.0.0.1:80",   
-      "http://127.0.0.1:3200",     
-      "http://localhost:80",  
-      "http://127.0.0.1",]
-    : "https://budget-buddyy-v90d.onrender.com",
+  origin: "http://localhost:5173", 
   credentials: true,
 };
 
@@ -57,18 +62,20 @@ import dashboardRoute from "./routes/dashboard.js";
 import expenseRoute from "./routes/expenses.js";
 import goalsRoute from "./routes/goals.js";
 import userRoute from "./routes/user.js";
+import authRoute from "./routes/auth.js";
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
 app.use("/logout", logoutRoute);
-app.use("/signup", signupRoute);
+// app.use("/signup", signupRoute);
 app.use("/login", loginRoute);
 app.use("/dashboard", dashboardRoute);
 app.use("/expense", expenseRoute);
 app.use("/goals", goalsRoute);
 app.use("/user", userRoute);
+app.use("/auth", authRoute); 
 
 // Error handling middleware
 app.use((err, req, res, next) => {

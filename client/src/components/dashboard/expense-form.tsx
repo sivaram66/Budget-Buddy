@@ -114,7 +114,7 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
               <Label htmlFor="statement">Expense Statement</Label>
               <Textarea
                 id="statement"
-                placeholder="Enter your expense (e.g., 'Lunch at McDonald's for $12.50')"
+                placeholder="Enter your expense (e.g., 'Lunch at McDonald's for ₹1500')"
                 value={statement}
                 onChange={(e) => setStatement(e.target.value)}
               />

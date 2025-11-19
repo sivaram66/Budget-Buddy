@@ -19,60 +19,34 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
+  // State for form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [valMsg, setValMsg] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkedAuth, setCheckedAuth] = useState(false);
+  // Modal/OTP state
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [codeMsg, setCodeMsg] = useState("");
+  // Timer/Resend state
+  const [otpTimer, setOtpTimer] = useState(30);  // seconds
+  const [resending, setResending] = useState(false);
   const navigate = useNavigate();
 
+  // Timer countdown effect
   useEffect(() => {
-    let isMounted = true;
-
-    const checkAuthStatus = async () => {
-      // Avoid multiple concurrent requests
-      if (checkedAuth) return;
-
-      setLoading(true);
-      try {
-        const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
-        // console.log(serverUrl);
-        if (!serverUrl) {
-          throw new Error("Server URL is not defined.");
-        }
-
-        const response = await axios.get(`${serverUrl}login/checkAuth`, {
-          withCredentials: true,
-        });
-
-        // Only navigate if the component is still mounted
-        if (isMounted && response.status === 200) {
-          if (setIsAuthenticated) {
-            setIsAuthenticated(true);
-          }
-          navigate("/dashboard");
-        }
-      } catch (error) {
-        console.log("User not logged in.", error);
-      } finally {
-        // Only set loading to false if the component is still mounted
-        if (isMounted) {
-          setLoading(false);
-          setCheckedAuth(true);
-        }
-      }
-    };
-
-    // Perform the check only once when the component mounts
-    checkAuthStatus();
-
-    // Cleanup function to prevent state updates on unmounted component
+    let interval: NodeJS.Timeout | null = null;
+    if (showVerifyModal && otpTimer > 0) {
+      interval = setInterval(() => setOtpTimer(t => t - 1), 1000);
+    }
     return () => {
-      isMounted = false;
+      if (interval) clearInterval(interval);
     };
-  }, [checkedAuth, navigate, setIsAuthenticated]);
+  }, [showVerifyModal, otpTimer]);
 
+  // --------- Event handlers ----------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setValMsg("");
@@ -81,56 +55,37 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
       setValMsg("Please fill in all required fields.");
       return;
     }
-
     try {
       setLoading(true);
       const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
-      if (!serverUrl) {
-        throw new Error("Server URL is not defined.");
-      }
-
-      const response =
-        mode === "login"
-          ? await axios.post(
-              `${serverUrl}login`,
-              { email, password },
-              { withCredentials: true }
-            )
-          : await axios.post(
-              `${serverUrl}signup`,
-              { name, email, password },
-              { withCredentials: true }
-            );
-
-      if (response.status === 201 && mode === "signup") {
-        console.log("Signup Successful");
-        const loginResponse = await axios.post(
+      if (!serverUrl) throw new Error("Server URL is not defined.");
+      if (mode === "signup") {
+        const response = await axios.post(
+          `${serverUrl}auth/signup`,
+          { name, email, password },
+          { withCredentials: true }
+        );
+        if (response.status === 200) {
+          setVerificationEmail(email);
+          setShowVerifyModal(true);
+          setOtpTimer(30);  // reset timer each time modal is opened
+          return;
+        }
+      } else {
+        const response = await axios.post(
           `${serverUrl}login`,
           { email, password },
           { withCredentials: true }
         );
-        if (loginResponse.status === 200) {
-          console.log("Login after signup success");
-          if (setIsAuthenticated) {
-            setIsAuthenticated(true);
-          }
+        if (response.status === 200) {
+          if (setIsAuthenticated) setIsAuthenticated(true);
           navigate("/dashboard", { replace: true });
         }
       }
-      if (response.status === 200) {
-        // Update the authentication state in the parent component
-        if (setIsAuthenticated) {
-          setIsAuthenticated(true);
-        }
-        navigate("/dashboard", { replace: true });
-      }
     } catch (error: unknown) {
-      console.log(error);
       if (axios.isAxiosError(error)) {
-        const errors = error.response?.data?.errors; // field-specific errors
+        const errors = error.response?.data?.errors;
         const message = error.response?.data?.message;
-
-        //  Flatten all validation messages into one readable string
         if (errors && typeof errors === "object") {
           const allMessages = Object.values(errors)
             .flat()
@@ -148,78 +103,192 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
     }
   };
 
+  const handleCodeVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCodeMsg("");
+    try {
+      const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+      const response = await axios.post(
+        `${serverUrl}auth/verify-code`,
+        { email: verificationEmail, code }
+      );
+      if (response.status === 201) {
+        setShowVerifyModal(false);
+        setValMsg("Signup complete! You can now login.");
+        navigate("/login");
+      }
+    } catch (err: any) {
+      setCodeMsg(err.response?.data?.message || "Code verification failed");
+    }
+  };
+
+  const handleResendCode = async () => {
+    setResending(true);
+    setCodeMsg("");
+    try {
+      const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+      await axios.post(
+        `${serverUrl}auth/signup`,
+        { name, email, password },
+        { withCredentials: true }
+      );
+      setOtpTimer(30);
+    } catch (err) {
+      setCodeMsg("Failed to resend code. Try again later.");
+    }
+    setResending(false);
+  };
+
+  // --------- Render ---------
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle>{mode === "login" ? "Login" : "Create Account"}</CardTitle>
-        <CardDescription>
-          {mode === "login"
-            ? "Enter your credentials to access your account"
-            : "Create a new account to get started"}
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent>
-          <div className="grid w-full items-center gap-4">
-            {mode === "signup" && (
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Your Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={loading}
-                />
+    <>
+      {/* Signup/Login main form: Hidden when showing OTP/verify modal */}
+      {!showVerifyModal && (
+        <Card className="w-[350px]">
+          <CardHeader>
+            <CardTitle>{mode === "login" ? "Login" : "Create Account"}</CardTitle>
+            <CardDescription>
+              {mode === "login"
+                ? "Enter your credentials to access your account"
+                : "Create a new account to get started"}
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent>
+              <div className="grid w-full items-center gap-4">
+                {mode === "signup" && (
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Your Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                )}
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
               </div>
-            )}
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+            </CardContent>
+            <CardFooter className="flex flex-col gap-2">
+              {valMsg && (
+                <pre className="text-red-700 whitespace-pre-line">{valMsg}</pre>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Processing..." : mode === "login" ? "Login" : "Sign Up"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => navigate(mode === "login" ? "/signup" : "/login")}
                 disabled={loading}
-              />
-            </div>
+              >
+                {mode === "login"
+                  ? "Don't have an account? Sign up"
+                  : "Already have an account? Login"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      )}
 
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-              />
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2">
-          {valMsg && <p className="text-red-700 whitespace-pre-line">{valMsg}</p>}
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Processing..." : mode === "login" ? "Login" : "Sign Up"}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={() => navigate(mode === "login" ? "/signup" : "/login")}
-            disabled={loading}
-          >
-            {mode === "login"
-              ? "Don't have an account? Sign up"
-              : "Already have an account? Login"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+      {/* OTP Gmail Verification Modal */}
+      {showVerifyModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          background: "rgba(0,0,0,0.95)",
+          zIndex: 10000,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <Card style={{ position: "relative", width: "400px", minHeight: "330px" }}>
+
+            {/* Close (X) Button */}
+            <button
+              onClick={() => setShowVerifyModal(false)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                background: "transparent",
+                border: "none",
+                fontSize: "1.5rem",
+                cursor: "pointer",
+                color: "#999"
+              }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+            <CardHeader>
+              <CardTitle>Enter Gmail Verification Code</CardTitle>
+              <CardDescription>
+                We've sent a code to your Gmail.<br />
+                Enter below to complete signup.
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleCodeVerify}>
+              <CardContent>
+                <Input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="6-digit code"
+                />
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2">
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleResendCode}
+                    disabled={otpTimer > 0 || resending}
+                  >
+                    {resending ? "Sending..." : "Resend OTP"}
+                  </Button>
+                  <span style={{ color: "gray", fontSize: "0.9em" }}>
+                    {otpTimer > 0 ? `Resend in ${otpTimer}s` : "You can resend"}
+                  </span>
+                </div>
+                {codeMsg && <span className="text-red-700">{codeMsg}</span>}
+                <Button type="submit">Verify & Create Account</Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </div>
+      )}
+    </>
   );
 }

@@ -23,7 +23,7 @@ import {
 const pricingPlans = [
   {
     name: "Free",
-    price: "$0",
+    price: "₹0",
     description: "Perfect for getting started",
     features: [
       "Basic expense tracking",
@@ -34,7 +34,7 @@ const pricingPlans = [
   },
   {
     name: "Pro",
-    price: "$9.99",
+    price: "₹999",
     period: "/month",
     description: "Best for personal finance",
     features: [

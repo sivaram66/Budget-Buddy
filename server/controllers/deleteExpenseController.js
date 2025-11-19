@@ -4,7 +4,7 @@ import expense from "../models/expensesModel.js";
 export const deleteExpenseController = async (req, res) => {
   try {
     // Get the eId from the request parameters
-    const { eId } = req.body;
+    const { eId } = req.params;
     if (!eId || eId == undefined) {
       // Return an error response if eId is missing
       return res.status(400).json({ message: "eId is required" });

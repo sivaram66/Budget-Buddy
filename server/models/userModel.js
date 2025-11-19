@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  transactionEmailsEnabled: { type: Boolean, default: false },
 });
 
 // Create and export the User model based on the schema

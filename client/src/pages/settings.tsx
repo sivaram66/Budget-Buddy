@@ -1,22 +1,24 @@
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
-import { useTheme } from "@/components/ui/theme-provider"
-import { useState } from "react"
-import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
-import { Check, CreditCard, Crown } from "lucide-react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useSearchParams } from "react-router-dom"
+  CardFooter
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/components/ui/theme-provider";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Check, CreditCard, Crown } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useSearchParams } from "react-router-dom";
 
 const plans = [
   {
@@ -58,32 +60,61 @@ const plans = [
       "Early access to new features",
     ],
   },
-]
+];
 
 export function SettingsPage() {
-  const [searchParams] = useSearchParams()
-  const { theme, setTheme } = useTheme()
-  const [emailNotifications, setEmailNotifications] = useState(true)
-  const [marketingEmails, setMarketingEmails] = useState(false)
-  const [profilePublic, setProfilePublic] = useState(true)
-  const [selectedPlan, setSelectedPlan] = useState("pro-monthly")
+  const [searchParams] = useSearchParams();
+  const { theme, setTheme } = useTheme();
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [marketingEmails, setMarketingEmails] = useState(false);
+  const [profilePublic, setProfilePublic] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState("pro-monthly");
+
+  // New: fetch and control transaction notification toggle from backend
+  useEffect(() => {
+    async function fetchPref() {
+      const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+      try {
+        const res = await axios.get(`${serverUrl}user/email-prefs`, { withCredentials: true });
+        setEmailNotifications(res.data.transactionEmailsEnabled);
+      } catch (error) {
+        console.error("Could not fetch notification prefs", error);
+      }
+    }
+    fetchPref();
+  }, []);
+
+  async function handleTransactionEmailToggle(newValue: boolean) {
+    const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+    await axios.patch(
+      `${serverUrl}user/email-prefs`,
+      { transactionEmailsEnabled: newValue },
+      { withCredentials: true }
+    );
+    setEmailNotifications(newValue);
+    toast.success(
+      newValue
+        ? "Transaction notifications enabled!"
+        : "Transaction notifications disabled."
+    );
+  }
 
   const handlePasswordChange = (e: React.FormEvent) => {
-    e.preventDefault()
-    toast.success("Password updated successfully")
-  }
+    e.preventDefault();
+    toast.success("Password updated successfully");
+  };
 
   const handlePlanChange = (planId: string) => {
-    setSelectedPlan(planId)
-    toast.success("Plan updated successfully")
-  }
+    setSelectedPlan(planId);
+    toast.success("Plan updated successfully");
+  };
 
   return (
     <div className="flex-1 p-8 space-y-6">
       <h1 className="text-3xl font-bold">Settings</h1>
 
-      <Tabs 
-        defaultValue={searchParams.get("tab") || "account"} 
+      <Tabs
+        defaultValue={searchParams.get("tab") || "account"}
         className="space-y-6"
       >
         <TabsList>
@@ -145,6 +176,7 @@ export function SettingsPage() {
           </Card>
         </TabsContent>
 
+        {/* ----------- NOTIFICATIONS TAB, Fully Updated ----------- */}
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -163,7 +195,7 @@ export function SettingsPage() {
                 </div>
                 <Switch
                   checked={emailNotifications}
-                  onCheckedChange={setEmailNotifications}
+                  onCheckedChange={handleTransactionEmailToggle}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -298,5 +330,5 @@ export function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
