@@ -15,26 +15,23 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Configure CORS for specific routes
-// const corsOptions = {
-//   origin: process.env.MODE === "dev"
-//     ? ["http://localhost:5173",
-//        "https://budget-buddyy-v90d.onrender.com", 
-//        "http://client:80", 
-//        "http://client:3200", 
-//        "http://localhost:3200",
-//       "http://localhost",           
-//       "http://127.0.0.1:80",   
-//       "http://127.0.0.1:3200",     
-//       "http://localhost:80",  
-//       "http://127.0.0.1",]
-//     : "https://budget-buddyy-v90d.onrender.com",
-//   credentials: true,
-// };
-
 const corsOptions = {
-  origin: "http://localhost:5173", 
+  origin: process.env.MODE === "dev"
+    ? ["http://localhost:5173",
+       "https://budget-buddyy-v90d.onrender.com", 
+       "http://client:80", 
+       "http://client:3200", 
+       "http://localhost:3200",
+      "http://localhost",           
+      "http://127.0.0.1:80",   
+      "http://127.0.0.1:3200",     
+      "http://localhost:80",  
+      "http://127.0.0.1",]
+    : "https://budget-buddyy-v90d.onrender.com",
   credentials: true,
 };
+
+
 
 // Apply CORS middleware only for routes that need it
 app.use((req, res, next) => {
