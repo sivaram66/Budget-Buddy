@@ -23,7 +23,9 @@ const corsOptions = {
        "http://client:3200", 
        "http://localhost:3200",
       "http://localhost",           
-      "http://127.0.0.1:80",       
+      "http://127.0.0.1:80",   
+      "http://127.0.0.1:3200",     
+      "http://localhost:80",  
       "http://127.0.0.1",]
     : "https://budget-buddyy-v90d.onrender.com",
   credentials: true,
@@ -37,6 +39,7 @@ app.use((req, res, next) => {
     next();
   }
 });
+app.use(cors(corsOptions));
 
 // Connect to MongoDB
 connectDB();

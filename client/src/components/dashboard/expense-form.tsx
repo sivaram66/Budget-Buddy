@@ -18,7 +18,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Toggle } from "@/components/ui/toggle"
 import { ExpenseFormMode } from "@/lib/types"
-import axios from "axios"
+
 const categories = [
   "Food & Dining",
   "Transportation",
@@ -41,26 +41,28 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
   const [resMsg, setresMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
+    e.preventDefault();
+    setresMsg("");
 
-  try {
-    let response;
-    
     if (mode === "normal") {
-      // Normal mode = AI-powered natural language (uses statement)
+      // Normal mode validation
       if (!statement.trim()) {
         setresMsg("Please enter an expense statement");
         return;
       }
       
-      response = await axios.post(
-        `${serverUrl}expense/createExpense`, 
-        { expense: { statement } },  // ✅ Correct format for AI
-        { withCredentials: true }
-      );
+      // Call parent onSubmit immediately with statement data
+      await onSubmit({ 
+        mode: "normal",
+        statement: statement.trim()
+      });
+      
+      // Reset form
+      setStatement("");
+      setresMsg("Expense added successfully!");
+      
     } else {
-      // Advanced mode = Manual form (uses amount, category, description)
+      // Advanced mode validation
       if (!amount || parseFloat(amount) <= 0) {
         setresMsg("Please enter a valid amount");
         return;
@@ -74,43 +76,21 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
         return;
       }
       
-      response = await axios.post(
-        `${serverUrl}expense/newExpense`,
-        { 
-          amount: parseFloat(amount), 
-          category, 
-          description 
-        },  // ✅ Correct format for manual entry
-        { withCredentials: true }
-      );
-    }
-
-    if (response.status === 201) {
-      const msg = response.data.message;
-      console.log(msg);
-      setresMsg(msg);
+      // Call parent onSubmit immediately with manual data
+      await onSubmit({
+        mode: "advanced",
+        amount: parseFloat(amount),
+        category: category,
+        description: description.trim()
+      });
       
-      // Reset form after successful submission
-      setStatement("");
+      // Reset form
       setAmount("");
       setCategory("");
       setDescription("");
-      
-      // Call parent onSubmit if needed
-      onSubmit(response.data.expense);
+      setresMsg("Expense added successfully!");
     }
-  } catch (error: unknown) {
-    console.error("Error: " + error);
-    if (axios.isAxiosError(error)) {
-      const errorMsg = error.response?.data?.message || 
-        error.message || 
-        "An unexpected error occurred";
-      setresMsg(errorMsg);
-    } else {
-      setresMsg("An unexpected error occurred");
-    }
-  }
-};
+  };
 
   return (
     <Card>
@@ -181,7 +161,7 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
           <Button type="submit" className="w-full">
             Add Expense
           </Button>
-          <p>{resMsg}</p>
+          {resMsg && <p className="text-sm text-center">{resMsg}</p>}
         </form>
       </CardContent>
     </Card>

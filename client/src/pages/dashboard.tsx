@@ -25,25 +25,21 @@ const initialExpenses: Expense[] = [
 ]
 
 export function DashboardPage() {
-  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses)
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const serverURL = import.meta.env.VITE_APP_SERVER_URL;
-
-  const isToday = (date: string) => {
-    const today = new Date();
-    const expenseDate = new Date(date);
-    return (
-      today.getFullYear() === expenseDate.getFullYear() &&
-      today.getMonth() === expenseDate.getMonth() &&
-      today.getDate() === expenseDate.getDate()
-    );
-  };
 
   const fetchExpenses = async () => {
     try {
       const response = await axios.get(`${serverURL}expense/getExpenses`, { withCredentials: true });
       if (response.status === 200) {
-        const todayExpenses = response.data.expenses.filter((expense: Expense) => isToday(expense.date));
-        setExpenses(todayExpenses);
+        const allExpenses = response.data.expenses || [];
+        
+        // Sort by date (most recent first) and take only the latest 5
+        const sortedExpenses = allExpenses.sort((a: Expense, b: Expense) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        
+        setExpenses(sortedExpenses.slice(0, 5));
       }
     } catch (error) {
       console.error("Error fetching expenses:", error);
@@ -54,19 +50,63 @@ export function DashboardPage() {
     fetchExpenses();
   }, []);
 
-  const handleAddExpense = (data: any) => {
+  const handleAddExpense = async (data: any) => {
+  console.log("Form data received:", data);
+
+  if (data.mode === "advanced") {
+    // Advanced mode - we have all the data
     const newExpense: Expense = {
-      eId: Math.random().toString(),
-      id: Math.random().toString(),
-      amount: data.amount || 0,
-      category: data.category || "Uncategorized",
+      eId: `temp-${Date.now()}`,
+      id: `temp-${Date.now()}`,
       description: data.description,
+      amount: data.amount,
+      category: data.category,
       date: new Date().toISOString(),
+    };
+
+    // IMMEDIATELY update the UI
+    setExpenses(prevExpenses => {
+      const updated = [newExpense, ...prevExpenses];
+      return updated.slice(0, 5);
+    });
+
+    // Save to backend
+    try {
+      await axios.post(
+        `${serverURL}expense/newExpense`,
+        {
+          amount: data.amount,
+          category: data.category,
+          description: data.description
+        },
+        { withCredentials: true }
+      );
+      
+      // Refresh to get real IDs
+      await fetchExpenses();
+    } catch (error) {
+      console.error("Error:", error);
+      // Remove optimistic update on failure
+      setExpenses(prev => prev.filter(exp => exp.eId !== newExpense.eId));
     }
-    if (isToday(newExpense.date)) {
-      setExpenses([newExpense, ...expenses])
+    
+  } else {
+    // Normal mode (AI-powered) - just send to backend and refresh
+    try {
+      await axios.post(
+        `${serverURL}expense/createExpense`,
+        { expense: { statement: data.statement } },
+        { withCredentials: true }
+      );
+      
+      // Refresh to show the AI-parsed expense
+      await fetchExpenses();
+    } catch (error) {
+      console.error("Error:", error);
     }
   }
+};
+
 
   return (
     <div className="flex-1 p-8 space-y-6">
@@ -74,13 +114,10 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
         <div className="space-y-6">
           <h2 className="text-xl font-semibold">Recent Expenses</h2>
-          <ExpenseTable expenses={[...expenses].reverse()} />
+          <ExpenseTable expenses={expenses} />
         </div>
         <div>
-          <ExpenseForm onSubmit={async (data) => {
-            handleAddExpense(data);
-            await fetchExpenses();
-          }} />
+          <ExpenseForm onSubmit={handleAddExpense} />
         </div>
       </div>
     </div>

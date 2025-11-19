@@ -43,7 +43,7 @@ const signupValidation = (req, res, next) => {
     return res.status(400).json({
       ok: false,
       message: "Validation error",
-      errors: fieldErrors, // send field-wise errors to frontend
+      errors: fieldErrors, 
     });
   }
 

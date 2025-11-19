@@ -32,7 +32,7 @@ function App() {
       try {
         const serverUrl = import.meta.env.VITE_APP_SERVER_URL;
         console.log("Server URL:", serverUrl);
-        const response = await axios.get(`${serverUrl}/login/checkAuth`, { withCredentials: true });
+        const response = await axios.get(`${serverUrl}login/checkAuth`, { withCredentials: true });
         if (response.status === 200) {
           setIsAuthenticated(true);
         }
