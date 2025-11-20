@@ -1,5 +1,5 @@
 export interface Expense {
-  eId: string;
+  _id: string;
   description: string;
   amount: number;
   category: string;
