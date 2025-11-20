@@ -38,7 +38,7 @@ export function DashboardPage() {
   if (data.mode === "advanced") {
     // Advanced mode - we have all the data
     const newExpense: Expense = {
-      eId: `temp-${Date.now()}`,
+      _id: `temp-${Date.now()}`,
       id: `temp-${Date.now()}`,
       description: data.description,
       amount: data.amount,
@@ -69,7 +69,7 @@ export function DashboardPage() {
     } catch (error) {
       console.error("Error:", error);
       // Remove optimistic update on failure
-      setExpenses(prev => prev.filter(exp => exp.eId !== newExpense.eId));
+      setExpenses(prev => prev.filter(exp => exp._id !== newExpense._id));
     }
     
   } else {

@@ -62,7 +62,7 @@ export function ExpenseFormDialog({
         amount: initialExpense.amount,
         category: categories.includes(initialExpense.category) ? initialExpense.category : "Other",
         description: initialExpense.description,
-        eId: initialExpense.eId
+        _id: initialExpense._id
       });
     }
   }, [initialExpense]);

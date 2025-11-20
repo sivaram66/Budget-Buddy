@@ -26,7 +26,7 @@ export function ExpenseTable({ expenses }: ExpenseTableProps) {
         </TableHeader>
         <TableBody>
           {expenses.map((expense) => (
-            <TableRow key={expense.eId}>
+            <TableRow key={expense._id}>
               <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
               <TableCell>{expense.description}</TableCell>
               <TableCell>{expense.category}</TableCell>
