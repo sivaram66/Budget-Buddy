@@ -34,7 +34,7 @@ export const sendExpenseEmail = async (to, { name, description, amount, category
           <tr><td><b>Date:</b></td><td>${date}</td></tr>
         </table>
         <div style="margin-top:18px;">
-          <a href="https://budgetbuddy.com/dashboard" style="background:#5b21b6;color:#fff;text-decoration:none;padding:9px 18px;border-radius:6px;font-weight:500;">
+          <a href="https://budget-buddyy-v90d.onrender.com/dashboard/expenses" style="background:#5b21b6;color:#fff;text-decoration:none;padding:9px 18px;border-radius:6px;font-weight:500;">
             View All Expenses
           </a>
         </div>
