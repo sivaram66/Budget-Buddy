@@ -4,25 +4,7 @@ import { ExpenseTable } from "@/components/dashboard/expense-table"
 import { Expense } from "@/lib/types"
 import axios from "axios"
 
-// Mock data
-const initialExpenses: Expense[] = [
-  {
-    eId: "edi01",
-    id: "1",
-    description: "Lunch at McDonald's",
-    amount: 12.50,
-    category: "Food & Dining",
-    date: new Date().toISOString(),
-  },
-  {
-    eId: "eId12",
-    id: "2",
-    description: "Uber ride to work",
-    amount: 25.00,
-    category: "Transportation",
-    date: new Date().toISOString(),
-  },
-]
+
 
 export function DashboardPage() {
   const [expenses, setExpenses] = useState<Expense[]>([])
