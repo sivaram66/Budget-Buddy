@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react"; // Changed: Imported icons
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -25,6 +26,10 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
   const [name, setName] = useState("");
   const [valMsg, setValMsg] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Changed: State for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
   // Modal/OTP state
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
@@ -184,16 +189,33 @@ export function AuthForm({ mode, setIsAuthenticated }: AuthFormProps) {
                     disabled={loading}
                   />
                 </div>
+                
+                {/* Changed: Password Field with Show/Hide Logic */}
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"} // Toggles type
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      className="pr-10" // Add padding-right so text doesn't overlap icon
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
+
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">

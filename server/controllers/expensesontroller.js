@@ -57,11 +57,12 @@ export const editExpenseController = async (req, res) => {
   try {
     const { amount, category, description } = req.body;
     const { eId } = req.params;
-    const updatedExpense = await expense.findOneAndUpdate(
-      { eId: eId },
+    const updatedExpense = await expense.findByIdAndUpdate(
+      eId, 
       { amount, category, description },
       { new: true }
     );
+
     if (!updatedExpense) {
       return res.status(404).json({ message: "Expense not found" });
     }
