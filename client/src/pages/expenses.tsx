@@ -175,11 +175,11 @@ export function ExpensesPage() {
   // ----------- New handlers for edit/delete -----------
 
   // Delete handler
-  const handleDelete = async (expenseId: string) => {
+  const handleDelete = async (expens_id: string) => {
     if (!confirm("Are you sure you want to delete this expense?")) return
     try {
       const response = await axios.delete(
-        `${serverURL}expense/deleteExpense/${expenseId}`,
+        `${serverURL}expense/deleteExpense/${expens_id}`,
         { withCredentials: true }
       )
       if (response.status === 200) {
@@ -202,7 +202,7 @@ export function ExpensesPage() {
   const handleUpdate = async (updatedExpense: Partial<Expense>) => {
     try {
       const response = await axios.put(
-        `${serverURL}expense/updateExpense/${selectedExpense?.eId}`,
+        `${serverURL}expense/updateExpense/${selectedExpense?._id}`,
         updatedExpense,
         { withCredentials: true }
       )
@@ -364,7 +364,7 @@ export function ExpensesPage() {
             ) : (
               filteredExpenses.map((expense, index) => (
                 <TableRow
-                  key={expense.eId}
+                  key={expense._id}
                   ref={index === filteredExpenses.length - 1 ? lastExpenseRef : null}
                 >
                   <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
@@ -387,7 +387,7 @@ export function ExpensesPage() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-destructive"
-                        onClick={() => handleDelete(expense.eId)} // Delete handler
+                        onClick={() => handleDelete(expense._id)} // Delete handler
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -24,7 +24,7 @@ router.post(
 );
 router.post("/newExpense", protectRoute, createExpenseController);
 
-router.delete("/deleteExpense/:eId", protectRoute, deleteExpenseController);
+router.delete("/deleteExpense/:id", protectRoute, deleteExpenseController);
 router.put("/updateExpense/:eId", protectRoute, editExpenseController);
 
 export default router;
