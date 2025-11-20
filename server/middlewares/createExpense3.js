@@ -80,10 +80,11 @@ export const createExpense3 = async (req, res, next) => {
         }
 
         // Ensure userId exists (assuming it's needed later)
-        if (!req.body.userId) {
-            console.warn("Warning: userId missing in request body for createExpense3");
-            // Decide if this is a critical error or not. For now, let it proceed but log.
-            // return res.status(400).json({ message: "Missing userId in request body" });
+
+        const userId = req.user?.userId || req.user?.id || req.user?._id;
+        if (!userId) {
+            console.error("Error: User ID missing from token in createExpense3");
+            return res.status(401).json({ message: "User not authenticated properly" });
         }
 
         // --- Combine Base Prompt and Expense Statement ---
@@ -139,7 +140,7 @@ export const createExpense3 = async (req, res, next) => {
 
         // --- Prepare Final Expense Object ---
         const finalExpense = {
-            userId: req.body.userId, // Ensure userId is correctly passed in the request
+            userId: userId, // Ensure userId is correctly passed in the request
             amount: expenseData.amount,     // Use data extracted by AI
             date: new Date(),               // Use current date/time
             category: expenseData.category, // Use data extracted by AI
