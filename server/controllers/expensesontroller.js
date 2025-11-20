@@ -31,7 +31,7 @@ export const createExpenseController = async (req, res) => {
     // ----- Check User Transaction Notification preference -----
     const user = await User.findOne({ userId });
     if (user?.transactionEmailsEnabled) {
-      await sendExpenseEmail(
+      sendExpenseEmail(
         user.email,
         {
           name: user.name,
@@ -40,7 +40,7 @@ export const createExpenseController = async (req, res) => {
           category,
           date: date.toLocaleDateString("en-IN"),
         }
-      );
+      ).catch(err => console.error("Background Email Error:", err));
       console.log("Expense email sent to user (notifications ON)");
     } else {
       console.log("Expense email NOT sent (notifications OFF)");
