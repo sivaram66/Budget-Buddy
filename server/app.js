@@ -4,11 +4,14 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
-
 dotenv.config();
 
 // Initialize Express app
 const app = express();
+app.use((req, res, next) => {
+  console.log(`👀 INCOMING REQUEST: ${req.method} ${req.url}`);
+  next();
+});
 
 // Middleware
 app.use(bodyParser.json());
@@ -66,7 +69,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/logout", logoutRoute);
-// app.use("/signup", signupRoute);
+app.use("/signup", signupRoute);
 app.use("/login", loginRoute);
 app.use("/dashboard", dashboardRoute);
 app.use("/expense", expenseRoute);

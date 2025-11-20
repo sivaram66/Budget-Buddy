@@ -8,7 +8,7 @@ import { authenticate } from "../middlewares/jwtAuthentication.js";
 
 import { login, setJWTCookie } from "../controllers/loginController.js";
 
-import { loginValidation } from "../middlewares/zodvaliation.js";
+import { loginValidation } from "../middlewares/zodvalidation.js";
 
 router.post("/", loginValidation, login, setJWTCookie);
 

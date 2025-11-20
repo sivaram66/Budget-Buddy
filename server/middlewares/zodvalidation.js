@@ -35,6 +35,8 @@ const goalSchema = zod.object({
 })
 
 const signupValidation = (req, res, next) => {
+  
+
   const result = signupSchema.safeParse(req.body);
   if (!result.success) {
     const fieldErrors = result.error.flatten().fieldErrors;
