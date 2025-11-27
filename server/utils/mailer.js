@@ -1,32 +1,41 @@
-import nodemailer from "nodemailer";
+import * as Brevo from '@getbrevo/brevo';
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com", 
-  port: 465,              
-  secure: true,           
-  auth: {
-    user: process.env.EMAIL_USER || process.env.GMAIL_USER, 
-    pass: process.env.EMAIL_PASS || process.env.GMAIL_PASS, 
-  },
-  connectionTimeout: 10000, 
-});
+// Configure the API Client
+const apiInstance = new Brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
+// Helper function to send email via Brevo API
+const sendEmail = async (sendSmtpEmail) => {
+  try {
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Email sent successfully via Brevo API. Message ID:', data.messageId);
+    return data;
+  } catch (error) {
+    console.error('Error sending email via Brevo:', error);
+    // Throw error so controller handles it
+    throw error;
+  }
+};
 
 export async function sendVerificationCode(email, code) {
-  return transporter.sendMail({
-    from: `"BudgetBuddy" <${process.env.GMAIL_USER}>`,
-    to: email,
-    subject: "Your BudgetBuddy verification code",
-    html: `<h2>Your verification code is: <b>${code}</b></h2>`,
-  });
+  const sendSmtpEmail = new Brevo.SendSmtpEmail();
+
+  sendSmtpEmail.subject = "Your BudgetBuddy verification code";
+  sendSmtpEmail.htmlContent = `<h2>Your verification code is: <b>${code}</b></h2>`;
+  sendSmtpEmail.sender = { "name": "BudgetBuddy", "email": process.env.SENDER_EMAIL };
+  sendSmtpEmail.to = [{ "email": email }];
+
+  return sendEmail(sendSmtpEmail);
 }
 
 export const sendExpenseEmail = async (to, { name, description, amount, category, date }) => {
-  await transporter.sendMail({
-    from: 'BudgetBuddy <your@email>',
-    to: to,
-    subject: 'Expense Added – BudgetBuddy',
-    html: `
+  const sendSmtpEmail = new Brevo.SendSmtpEmail();
+
+  sendSmtpEmail.subject = "Expense Added – BudgetBuddy";
+  sendSmtpEmail.sender = { "name": "BudgetBuddy", "email": process.env.SENDER_EMAIL };
+  sendSmtpEmail.to = [{ "email": to }];
+  
+  sendSmtpEmail.htmlContent = `
       <div style="max-width:430px;margin:24px auto;border-radius:12px;box-shadow:0 2px 20px #eee;padding:28px;font-family:sans-serif;background:#f8fafc;">
         <h2 style="color:#5b21b6;margin-top:0;">💸 Expense Added</h2>
         <p>Hi <b>${name}</b>,</p>
@@ -47,6 +56,7 @@ export const sendExpenseEmail = async (to, { name, description, amount, category
           This is an automated notification—no reply needed.
         </div>
       </div>
-    `
-  });
+    `;
+
+  return sendEmail(sendSmtpEmail);
 };
