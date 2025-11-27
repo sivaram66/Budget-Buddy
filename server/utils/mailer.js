@@ -1,18 +1,16 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
-   host: "smtp.gmail.com",
-  port: 587,         
-  secure: false, 
+  host: "smtp.gmail.com", 
+  port: 465,              
+  secure: true,           
   auth: {
-    user: process.env.GMAIL_USER, 
-    pass: process.env.GMAIL_PASS, 
+    user: process.env.EMAIL_USER || process.env.GMAIL_USER, 
+    pass: process.env.EMAIL_PASS || process.env.GMAIL_PASS, 
   },
-  tls: {
-    rejectUnauthorized: false 
-  }
+  connectionTimeout: 10000, 
 });
+
 
 export async function sendVerificationCode(email, code) {
   return transporter.sendMail({
